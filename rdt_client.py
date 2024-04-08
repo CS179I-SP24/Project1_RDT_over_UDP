@@ -26,6 +26,12 @@ def file2hash(file_byte):
 # |           4byte SEQ              |
 # |           4byte ACK              |
 # |            Payload               |
+# type:
+# REQUEST: 0
+# RESPONSE: 1
+# GET: 2
+# DATA: 3
+# ACK: 4
 
 def start_download(sock):
     global file_to_download
@@ -90,7 +96,7 @@ def process_inbound_udp(sock):
         
         # step2: check if downloading finished
 
-        # step3: if finished, decode and save the file to download_path
+        # step3: if finished, decode and save the file to download_path and call finish_download to check integrity
         
         pass
 

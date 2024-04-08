@@ -20,6 +20,12 @@ HEADER_LEN = struct.calcsize(HEADER_FORMAT)
 # |           4byte SEQ              |
 # |           4byte ACK              |
 # |            Payload               |
+# type:
+# REQUEST: 0
+# RESPONSE: 1
+# GET: 2
+# DATA: 3
+# ACK: 4
 
 def file2hash(file_byte):
     sha1 = hashlib.sha1()
