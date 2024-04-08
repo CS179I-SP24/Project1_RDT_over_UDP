@@ -15,6 +15,11 @@ BUF_SIZE = 1400
 HEADER_FORMAT = "HHHHII"
 HEADER_LEN = struct.calcsize(HEADER_FORMAT)
 
+def file2hash(file_byte):
+    sha1 = hashlib.sha1()
+    sha1.update(file_byte)
+    return sha1.hexdigest()
+
 
 # |2byte magic     |2byte type       |
 # |2byte header len|2byte payload len|
@@ -37,6 +42,15 @@ def start_download(sock):
     # step3: send the pkt to server:
     sock.sendto(req_pkt, (server_ip, server_port))
 
+def finish_download(downloaded_bytes):
+    global file_hash
+
+    downloaded_hash = file2hash(downloaded_bytes)
+    if downloaded_hash == file_hash:
+        print("Congrats! Download completed")
+    else:
+        print(f"Download error. Expected hash: {file_hash}, received: {downloaded_hash}")
+
 
 def process_inbound_udp(sock):
     global file_to_download
@@ -46,19 +60,18 @@ def process_inbound_udp(sock):
 
     # Receive pkt
     pkt, from_addr = sock.recvfrom(BUF_SIZE)
-    print(pkt)
     Magic, Type, hlen, plen, Seq, Ack= struct.unpack(HEADER_FORMAT, pkt[:HEADER_LEN])
     payload = pkt[HEADER_LEN:]
 
     Type = socket.ntohs(Type)
     Seq = socket.ntohl(Seq)
     Ack = socket.ntohl(Ack)
-    
-    print(f"{Magic}, {Type}")
+
     if Type == 1:
         # received an Response pkt
         # load the hash value of file
         file_hash_byte = payload[:20]
+        file_hash = file_hash_byte
 
         # send back GET pkt
         get_header = struct.pack(HEADER_FORMAT, socket.htons(Magic),socket.htons(2), socket.htons(HEADER_LEN), socket.htons(len(file_hash_byte)), socket.htonl(0), socket.htonl(0))

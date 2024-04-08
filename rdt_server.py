@@ -21,9 +21,9 @@ HEADER_LEN = struct.calcsize(HEADER_FORMAT)
 # |           4byte ACK              |
 # |            Payload               |
 
-def file2hash(file):
+def file2hash(file_byte):
     sha1 = hashlib.sha1()
-    sha1.update(file.encode())
+    sha1.update(file_byte)
     return sha1.hexdigest()
 
 def process_inbound_udp(sock):
@@ -32,7 +32,6 @@ def process_inbound_udp(sock):
 
     # Receive pkt
     pkt, from_addr = sock.recvfrom(BUF_SIZE)
-    print(pkt)
     Magic, Type, hlen, plen, Seq, Ack= struct.unpack(HEADER_FORMAT, pkt[:HEADER_LEN])
     payload = pkt[HEADER_LEN:]
 
@@ -40,7 +39,6 @@ def process_inbound_udp(sock):
     Seq = socket.ntohl(Seq)
     Ack = socket.ntohl(Ack)
 
-    print(f"{Magic}, {Type}")
     if Type == 0:
         # received an Request pkt
         # load the name of file requested
