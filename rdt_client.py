@@ -57,6 +57,7 @@ def finish_download(downloaded_bytes):
     else:
         print(f"Download error. Expected hash: {file_hash}, received: {downloaded_hash}")
 
+    sys.exit()
 
 def process_inbound_udp(sock):
     global file_to_download
@@ -77,7 +78,7 @@ def process_inbound_udp(sock):
         # received an Response pkt
         # load the hash value of file
         file_hash_byte = payload[:20]
-        file_hash = file_hash_byte
+        file_hash = file_hash_byte.hex()
 
         # send back GET pkt
         get_header = struct.pack(HEADER_FORMAT, socket.htons(Magic),socket.htons(2), socket.htons(HEADER_LEN), socket.htons(len(file_hash_byte)), socket.htonl(0), socket.htonl(0))
